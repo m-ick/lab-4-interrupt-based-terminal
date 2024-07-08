@@ -1,6 +1,7 @@
 
 /* Includes */
 #include "mbed.h"
+#include <cstdio>
 #include "HTS221Sensor.h"
 #include "LPS22HBSensor.h"
 #include "LSM6DSLSensor.h"
@@ -15,6 +16,17 @@ static LSM6DSLSensor acc_gyro(&devI2c,0xD4,D4,D5); // high address
 static LIS3MDL magnetometer(&devI2c, 0x3C);
 static DigitalOut shutdown_pin(PC_6);
 static VL53L0X range(&devI2c, &shutdown_pin, PC_7, 0x52);
+
+// InterruptIn blue_btn(PC_13);
+// DigitalOut pressed(PA_5);
+// DigitalOut released(PC_9);
+
+UnbufferedSerial serial_port(USBTX, USBRX);
+
+DigitalOut led_1(LED1);
+DigitalOut led_2(LED2);
+DigitalOut led_3(LED3);
+char buff;
 
 
 // functions to print sensor data
@@ -58,7 +70,65 @@ void print_distance(){
     }
 }
 
-/* Simple main function */
+void readSerial(){
+    if(serial_port.readable()){
+        serial_port.read(&buff, 1);
+        serial_port.write(&buff, 1);
+        led_1 = 0;
+        led_2 = 0;
+        led_3 = 0;
+        // printf("0x%X\r\n", serial_port.read(&buff, 1));
+
+        // wait_us(1000);
+        // switch (serial_port.read(&buff, 1)) {
+        // switch (serial_port.write(&buff, 1)) {
+        switch (buff) {
+         case '1': 
+            // print_accel();
+            led_1 = 0;
+            led_2 = 0;
+            led_3 = 1;
+            break;
+         case '2': 
+            // print_accel();
+            led_1 = 0;
+            led_2 = 1;
+            led_3 = 0;
+            break;
+         case '3': 
+            // print_accel();
+            led_1 = 0;
+            led_2 = 1;
+            led_3 = 1;
+            break;
+         case '4': 
+            // print_accel();
+            led_1 = 1;
+            led_2 = 0;
+            led_3 = 0;
+            break;
+         case '5': 
+            // print_accel();
+            led_1 = 1;
+            led_2 = 0;
+            led_3 = 1;
+            break;
+        case '6': 
+            // print_accel();
+            led_1 = 1;
+            led_2 = 1;
+            led_3 = 1;
+            break;
+        }  
+        // strcmp( argc[i], "&") == 0     
+        // if(buff == 'a'){
+        //     printf("\n\r--- Reading sensor values ---\n\r"); ; 
+        // } else {
+        //     serial_port.write(&buff, 1);
+        // }
+    }
+}
+
 int main() {
     uint8_t id;
     float value1, value2;
@@ -99,8 +169,22 @@ int main() {
     print_gyro();
     print_distance();
     printf("\r\n");
+
+    led_1 = 1;
+    led_2 = 1;
+    led_3 = 1;
+
+    // serial_port.baud(115200);
+    serial_port.baud(9600);
+    // serial_port.format(
+    //     /* bits */ 8,
+    //     /* parity */ SerialBase::None,
+    //     /* stop bit */ 1
+    // );
+    
+    serial_port.attach(readSerial);
     
     while(1) {
-        wait_us(500000);
+         wait_us(500000);
     }
 }
