@@ -84,7 +84,7 @@ void readSerial(){
         // switch (serial_port.write(&buff, 1)) {
         switch (buff) {
          case '1': 
-            // print_accel();
+            print_accel();
             led_1 = 0;
             led_2 = 0;
             led_3 = 1;
