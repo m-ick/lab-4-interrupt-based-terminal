@@ -182,9 +182,50 @@ int main() {
     //     /* stop bit */ 1
     // );
     
-    serial_port.attach(readSerial);
-    
     while(1) {
+        serial_port.read(&buff, 1);
+        serial_port.write(&buff, 1);
+
+        switch (buff) {
+         case '1': 
+            printf(": Temperature & Presssure: ");
+            print_t_rh();  
+            printf("\r\n");
+            break;
+         case '2': 
+            printf(": Magnetometer: ");
+            print_mag();   
+            printf("\r\n"); 
+            break;
+         case '3': 
+            printf(": Acceleration: ");
+            print_accel();
+            printf("\r\n");    
+            break;
+         case '4': 
+            printf(": Gyroscope: ");
+            print_gyro();  
+            printf("\r\n");  
+            break;
+         case '5': 
+            printf(": Distance: ");
+            print_distance();
+            printf("\r\n");
+            break;
+        case '6':                 
+            printf("\n\r--- Reading sensor values ---\n\r"); ;
+            print_t_rh();
+            print_mag();
+            print_accel();
+            print_gyro();
+            print_distance();
+            printf("\r\n");
+            break;
+        }  
+
+    // serial_port.attach(readSerial);
+    
+    // while(1) {
          wait_us(500000);
     }
 }
