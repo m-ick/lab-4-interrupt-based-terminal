@@ -17,10 +17,6 @@ static LIS3MDL magnetometer(&devI2c, 0x3C);
 static DigitalOut shutdown_pin(PC_6);
 static VL53L0X range(&devI2c, &shutdown_pin, PC_7, 0x52);
 
-// InterruptIn blue_btn(PC_13);
-// DigitalOut pressed(PA_5);
-// DigitalOut released(PC_9);
-
 UnbufferedSerial serial_port(USBTX, USBRX);
 
 DigitalOut led_1(LED1);
@@ -70,7 +66,7 @@ void print_distance(){
     }
 }
 
-void readSerial(){
+void readSerial(){ // was testing, trying to get print_accel() etc calling from with readSerial()
     if(serial_port.readable()){
         serial_port.read(&buff, 1);
         serial_port.write(&buff, 1);
@@ -90,7 +86,7 @@ void readSerial(){
             led_3 = 1;
             break;
          case '2': 
-            // print_accel();
+            //print_accel();
             led_1 = 0;
             led_2 = 1;
             led_3 = 0;
@@ -162,7 +158,7 @@ int main() {
     acc_gyro.read_id(&id);
     printf("LSM6DSL accelerometer & gyroscope = 0x%X\r\n", id);
     
-    printf("\n\r--- Reading sensor values ---\n\r"); ;
+    printf("\n\r--- Reading sensor values ---\n\r");
     print_t_rh();
     print_mag();
     print_accel();
@@ -170,17 +166,25 @@ int main() {
     print_distance();
     printf("\r\n");
 
+    // display instructions
+    printf("Press 1: for Thermometer\n");
+    printf("Press 2: for Magnetometer\n");
+    printf("Press 3: for Accelerometer\n");
+    printf("Press 4: for Gyroscope\n");
+    printf("Press 5: for Distance\n");
+    printf("Press 6: for all sensors\n");  
+    printf("\r\n");
+
     led_1 = 1;
     led_2 = 1;
     led_3 = 1;
 
-    // serial_port.baud(115200);
     serial_port.baud(9600);
-    // serial_port.format(
-    //     /* bits */ 8,
-    //     /* parity */ SerialBase::None,
-    //     /* stop bit */ 1
-    // );
+    serial_port.format(
+        /* bits */ 8,
+        /* parity */ SerialBase::None,
+        /* stop bit */ 1
+    );
     
     while(1) {
         serial_port.read(&buff, 1);
